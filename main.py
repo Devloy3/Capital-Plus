@@ -56,6 +56,9 @@ def interfaz(id):
         if option == 1:
             ahorro = Menus(id)
             ahorro.menu_ahorro()
+        elif option == 4:
+            calculo = Menus(id)
+            calculo.menu_deudas()
         elif option == 5:
             calculo = Menus(id)
             calculo.menu_calculadoras()
@@ -115,7 +118,7 @@ class Menus:
                 print(desglose)
             elif option_3 == 3:
                 ingresos = int(input("Ingresos:"))
-                gastos = int(input("Gastos"))
+                gastos = int(input("Gastos:"))
                 resultado = self.calculadora.desglose_gastos(ingresos,gastos)
                 print(resultado)
             elif option_3 == 4:
@@ -127,6 +130,12 @@ class Menus:
             print(f"Para acabar con tus deudas: {int(cantidad)}€\n")
             print("1.Metodo bola de nieve")
             print("2.Metodo Avalancha")
+            print("3.Insertar Deuda")
+            print("4.Actualizar cantidad_pagada")
+
+            option_4 = int(input("Escoge:"))
+
+            
 
 
             
