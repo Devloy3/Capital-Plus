@@ -126,7 +126,7 @@ class Menus:
             cantidad = dao.finish_deudas(self.user)
             print(f"Para acabar con tus deudas: {int(cantidad)}€\n")
             print("1.Metodo bola de nieve")
-            print("2.Metodo")
+            print("2.Metodo Avalancha")
 
 
             
