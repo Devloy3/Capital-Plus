@@ -1,9 +1,11 @@
+ ````
   ____            _ _        _   ____  _           
  / ___|__ _ _ __ (_) |_ __ _| | |  _ \| |_   _ ___ 
 | |   / _` | '_ \| | __/ _` | | | |_) | | | | / __|
 | |__| (_| | |_) | | || (_| | | |  __/| | |_| \__ \
  \____\__,_| .__/|_|\__\__,_|_| |_|   |_|\__,_|___/
-           |_|         
+           |_|      
+```   
 
 **Capital Plus** es una fintech moderna que te ayuda a **ahorrar mejor, invertir con inteligencia y gestionar tus deudas de forma sencilla**.  
 Nuestro objetivo es darte el control total de tus finanzas personales con herramientas claras, seguras y fáciles de usar.
