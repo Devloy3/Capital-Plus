@@ -62,22 +62,22 @@ class DAOfinancial:
 
         return float(dinero_mes)
     
-    def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada, plazo=None):
+    def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
         try:
-            self.cursor.execute("INSERT INTO deudas (user, descripcion, cantidad_total, interes, cantidad_pagada, plazo) VALUES (?, ?, ?, ?, ?, ?, ?)", (id, descripcion, cantidad_total, interes, cantidad_pagada, plazo))
+            self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, cantidad_total, interes, cantidad_pagada))
             self.conn.commit()
             intento = "Se inserto correctamente"
             return intento
         except sqlite3.Error as e:
-            texto = "El Error ha sido:" + e
+            texto = f"El Error ha sido:{e}"
             return texto
     
     def metodo_bola_de_nieve(self,id):
-        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,plazo,estado FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
+        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,estado FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
         return self.cursor.fetchall()
     
     def metodo_avalancha(self,id):
-        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,interes,plazo,estado FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
+        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,interes,estado FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
         return self.cursor.fetchall()
 
     def finish_deudas(self,id):
@@ -91,5 +91,5 @@ class DAOfinancial:
             texto = f" Se actualizo {descripcion}"
             return texto
         except sqlite3.Error as e:
-            texto_2 = "El error fue:" + e
+            texto_2 = f"El error fue:{e}"
             return texto_2

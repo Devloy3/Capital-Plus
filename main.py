@@ -2,6 +2,7 @@ from DAOfinancial import DAOfinancial
 from getpass import getpass
 from calculadoras_finanzas import Finanzas
 from colorama import Fore,Back,Style,init
+from tabulate import tabulate
 
 dao = DAOfinancial()
 init(autoreset=True)
@@ -78,19 +79,19 @@ class Menus:
             print(Style.BRIGHT +"4.Saldo perdido por inflacion")
             print(Style.BRIGHT +"5.Volver \n")
 
-            option_2 = int(input("Escoge:"))
+            option = int(input("Escoge:"))
 
-            if option_2 == 1:
+            if option == 1:
                 monto = float(input("Cantidad:"))
                 dao.registrar_ahorro(monto,self.user)
-            elif option_2 == 2:
+            elif option == 2:
                 resultado = dao.consultar_saldo_total(self.user)
                 print(f"\nCantidad ahorrada total: {resultado[0]}€")
-            elif option_2 == 3:
+            elif option == 3:
                 años = int(input("Meses:"))
                 cantidad = dao.tiempo_dinero_ahorrado(self.user,años)
                 print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
-            elif option_2 == 5:
+            elif option == 5:
                 break
 
     def menu_calculadoras(self):
@@ -100,9 +101,9 @@ class Menus:
             print(Style.BRIGHT +"3.Gastos vs Ingresos")
             print(Style.BRIGHT +"4.Volver \n")
 
-            option_3 = int(input("Escoge:"))
+            option = int(input("Escoge:"))
 
-            if option_3 == 1:
+            if option == 1:
                 monto = int(input("Dinero que se quiere ahorrar:"))
                 años = int(input("En cuantos años se quiere conseguir:"))
                 inflacion = int(input("Inflacion esperada: "))
@@ -112,28 +113,48 @@ class Menus:
                 print(f"{'Dinero Nominal:':35}{cuantia}€")
                 print(f"{'Años:':35}{años_2}")
                 print(f"{'Dinero perdido por la inflacion:':35}{int(restante)}€")
-            elif option_3 == 2:
+            elif option == 2:
                 salario = int(input("Salario Actual:"))
                 desglose = self.calculadora.administracion_de_dinero(salario)
                 print(desglose)
-            elif option_3 == 3:
+            elif option == 3:
                 ingresos = int(input("Ingresos:"))
                 gastos = int(input("Gastos:"))
                 resultado = self.calculadora.desglose_gastos(ingresos,gastos)
                 print(resultado)
-            elif option_3 == 4:
+            elif option == 4:
                 break
 
     def menu_deudas(self):
         while True:
             cantidad = dao.finish_deudas(self.user)
-            print(f"Para acabar con tus deudas: {int(cantidad)}€\n")
-            print("1.Metodo bola de nieve")
-            print("2.Metodo Avalancha")
-            print("3.Insertar Deuda")
-            print("4.Actualizar cantidad_pagada")
+            print(f"\nTus deudas: {cantidad[0]}€\n")
+            print(Style.BRIGHT +"1.Metodo bola de nieve")
+            print(Style.BRIGHT +"2.Metodo Avalancha")
+            print(Style.BRIGHT +"3.Insertar Deuda")
+            print(Style.BRIGHT +"4.Actualizar cantidad_pagada")
+            print(Style.BRIGHT +"5.Salir \n")
 
-            option_4 = int(input("Escoge:"))
+            option = int(input("Escoge:"))
+            
+            if option== 1:
+                resultado = dao.metodo_bola_de_nieve(self.user)
+                headers = ["Descripcion","Cantidad Total","Cantidad Pagada","estado"]
+                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+            elif option == 2:
+                resultado = dao.metodo_avalancha(self.user)
+                headers = ["Descripcion","Cantidad Total","Cantidad Pagada","interes","estado"]
+                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+            elif option == 3:
+                descripcion = input("Descripcion:")
+                cantidad_total = float(input("Cantidad Total:"))
+                interes = float(input("Interes(sino 0.00):"))
+                cantidad_pagada = float(input("Cantidad Pagada(sino 0.00):"))
+                resp = dao.create_deuda(self.user, descripcion, cantidad_total, interes, cantidad_pagada)
+                print(resp)
+            elif option == 5:
+                break
+            
 
             
 
