@@ -160,10 +160,10 @@ class Menus:
 
     def menu_inversion(self):
         while True:
-            print(Style.BRIGHT +"1.Insertar Inversion")
+            print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
             print(Style.BRIGHT +"3.Vender Accion")
-            print(Style.BRIGHT +"4.Salir")
+            print(Style.BRIGHT +"4.Salir\n")
                 
             option = int(input("Escoge:"))
                 
@@ -177,7 +177,7 @@ class Menus:
                 resultado = dao.read_inversiones(self.user)
                 headers = ["ID","SIGLAS","CANTIDAD","PRECIO"]
                 print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
-            elif option == 3:
+            elif option == 4:
                 break
             
 
