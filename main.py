@@ -57,6 +57,9 @@ def interfaz(id):
         if option == 1:
             ahorro = Menus(id)
             ahorro.menu_ahorro()
+        elif option == 2:
+            inversiones = Menus(id)
+            inversiones.menu_inversion()
         elif option == 4:
             calculo = Menus(id)
             calculo.menu_deudas()
@@ -139,11 +142,11 @@ class Menus:
             
             if option== 1:
                 resultado = dao.metodo_bola_de_nieve(self.user)
-                headers = ["Descripcion","Cantidad Total","Cantidad Pagada","estado"]
+                headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
                 print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
             elif option == 2:
                 resultado = dao.metodo_avalancha(self.user)
-                headers = ["Descripcion","Cantidad Total","Cantidad Pagada","interes","estado"]
+                headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
                 print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
             elif option == 3:
                 descripcion = input("Descripcion:")
@@ -153,6 +156,28 @@ class Menus:
                 resp = dao.create_deuda(self.user, descripcion, cantidad_total, interes, cantidad_pagada)
                 print(resp)
             elif option == 5:
+                break
+
+    def menu_inversion(self):
+        while True:
+            print(Style.BRIGHT +"1.Insertar Inversion")
+            print(Style.BRIGHT +"2.Que inversiones tengo?")
+            print(Style.BRIGHT +"3.Vender Accion")
+            print(Style.BRIGHT +"4.Salir")
+                
+            option = int(input("Escoge:"))
+                
+            if option== 1:
+                siglas = input("Siglas:")
+                precio_compra = float(input("Precio_de_Compra(sino 0.00):"))
+                cantidad = float(input("Cantidad(sino 0.00):"))
+                res = dao.create_inversion(siglas,cantidad,precio_compra,self.user)
+                print(res)
+            elif option == 2:
+                resultado = dao.read_inversiones(self.user)
+                headers = ["ID","SIGLAS","CANTIDAD","PRECIO"]
+                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+            elif option == 3:
                 break
             
 

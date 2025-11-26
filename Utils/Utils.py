@@ -11,7 +11,7 @@ sql = """
             );
             
             CREATE TABLE inversiones(
-                fecha_compra DATE,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 siglas VARCHAR(10),
                 cantidad DECIMAL(5,2),
                 precio_compra DECIMAL(5,2),
@@ -26,14 +26,13 @@ sql = """
                 FOREIGN KEY (user) REFERENCES users(id)
             );
                    
-            CREATE TABLE deudas(
+          CREATE TABLE deudas(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user INTEGER,
                 Descripcion TEXT,
                 cantidad_total DECIMAL(10,2),
                 interes DECIMAL(4,2) DEFAULT 0.00,
                 cantidad_pagada DECIMAL(10,2) DEFAULT 0.00,
-                plazo INTEGER,
-                estado VARCHAR(20) DEFAULT 'pendiente',
                 FOREIGN KEY (user) REFERENCES users(id)
             );
 """

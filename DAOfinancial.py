@@ -39,7 +39,7 @@ class DAOfinancial:
                 print(Fore.RED +"\nContrasenya Incorrecta")
         else:
             print(Fore.RED + "\nUsuario Incorrecto")
-
+    # ahrro registro
     def registrar_ahorro(self,dinero,id):
         fecha = date.today()
         fecha_string = fecha.strftime("%Y/%m/%d")
@@ -61,7 +61,7 @@ class DAOfinancial:
         dinero_mes = cantidad_2[0] / meses
 
         return float(dinero_mes)
-    
+    # Crud mas o menos de deuda
     def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
         try:
             self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, cantidad_total, interes, cantidad_pagada))
@@ -73,23 +73,38 @@ class DAOfinancial:
             return texto
     
     def metodo_bola_de_nieve(self,id):
-        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,estado FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
+        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
         return self.cursor.fetchall()
     
     def metodo_avalancha(self,id):
-        self.cursor.execute("SELECT Descripcion,cantidad_total,cantidad_pagada,interes,estado FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
+        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
         return self.cursor.fetchall()
 
     def finish_deudas(self,id):
-        self.cursor.execute("SELECT (SUM(cantidad_total) - SUM(cantidad_pagada)) AS Total FROM deudas WHERE user=?",(id,))
+        self.cursor.execute("SELECT SUM((cantidad_total * intereses) - cantidad_pagada) AS Total FROM deudas WHERE user=?",(id,))
         return self.cursor.fetchone()
     
-    def insertar_cantidad_pagada(self,cantidad,descripcion):
+    def insertar_cantidad_pagada(self,cantidad,id):
         try:
-            self.cursor.execute("UPDATE deudas SET cantidad_pagada=? WHERE Descripcion=?",(cantidad,descripcion))
+            self.cursor.execute("UPDATE deudas SET cantidad_pagada=? WHERE id=?",(cantidad,id))
             self.conn.commit()
-            texto = f" Se actualizo {descripcion}"
+            texto = f" Se actualizo la cantidad pagada"
             return texto
         except sqlite3.Error as e:
             texto_2 = f"El error fue:{e}"
             return texto_2
+    
+    # Crud mas o menos de Inversion
+    def create_inversion(self, siglas, cantidad, precio_compra, id):
+        try:
+            self.cursor.execute("INSERT INTO inversiones(siglas, cantidad, precio_compra, user) VALUES (?, ?, ?, ?)", (siglas, cantidad, precio_compra, id))
+            self.conn.commit()
+            texto = "Inversion Insertada"
+            return texto
+        except sqlite3.Error as e:
+            texto = f"el error ha sido: {e}"
+
+    def read_inversiones(self,id):
+        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=?", (id,))
+        return self.cursor.fetchall()
+   
