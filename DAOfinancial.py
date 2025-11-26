@@ -2,6 +2,7 @@ from datetime import date
 import sqlite3
 import bcrypt
 from colorama import Fore,Back,Style,init
+import yfinance as yf
 
 init(autoreset=True)
 
@@ -107,4 +108,19 @@ class DAOfinancial:
     def read_inversiones(self,id):
         self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=?", (id,))
         return self.cursor.fetchall()
-   
+    
+    def ver_el_precio_actual(self,id):
+        self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=?",(id,))
+        resultado = self.cursor.fetchall()
+        lista = []
+
+        for siglas,cantidad,Precio in resultado:
+            accion = yf.Ticker(siglas)
+            dt_accion = accion.history(period="1mo", interval="1d")
+            precio_accion = dt_accion["Close"].iloc[-1]
+            precio_actual = precio_accion*cantidad
+            conversion = float(precio_actual)
+            porcentage = ((conversion - Precio) / Precio) * 100
+            lista.append((siglas,round(conversion,2), round(Precio,2), round(porcentage,2)))
+        
+        return lista

@@ -160,6 +160,9 @@ class Menus:
 
     def menu_inversion(self):
         while True:
+            acciones = dao.ver_el_precio_actual(self.user)
+            EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "PORCENTAJE"]
+            print("\n"+tabulate(acciones, headers=EN, tablefmt="github"))
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
             print(Style.BRIGHT +"3.Vender Accion")
