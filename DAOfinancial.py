@@ -82,7 +82,10 @@ class DAOfinancial:
         return self.cursor.fetchall()
 
     def finish_deudas(self,id):
-        self.cursor.execute("SELECT SUM((cantidad_total * intereses) - cantidad_pagada) AS Total FROM deudas WHERE user=?",(id,))
+        self.cursor.execute("""SELECT SUM(CASE 
+        WHEN interes != 0 THEN (cantidad_total * interes) - cantidad_pagada 
+        ELSE cantidad_total - cantidad_pagada 
+        END) AS Total FROM deudas WHERE user=?""",(id,))
         return self.cursor.fetchone()
     
     def insertar_cantidad_pagada(self,cantidad,id):
@@ -106,11 +109,11 @@ class DAOfinancial:
             texto = f"el error ha sido: {e}"
 
     def read_inversiones(self,id):
-        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=?", (id,))
+        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio,(cantidad*precio_venta-precio_compra) AS Venta FROM inversiones WHERE user=?", (id,))
         return self.cursor.fetchall()
     
     def ver_el_precio_actual(self,id):
-        self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=?",(id,))
+        self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND precio_venta=0",(id,))
         resultado = self.cursor.fetchall()
         lista = []
 
@@ -120,7 +123,7 @@ class DAOfinancial:
             precio_accion = dt_accion["Close"].iloc[-1]
             precio_actual = precio_accion*cantidad
             conversion = float(precio_actual)
-            porcentage = ((conversion - Precio) / Precio) * 100
-            lista.append((siglas,round(conversion,2), round(Precio,2), round(porcentage,2)))
+            ganancia =  conversion - Precio
+            lista.append((siglas,round(conversion,2), round(Precio,2), round(ganancia,2)))
         
         return lista

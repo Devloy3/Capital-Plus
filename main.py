@@ -78,7 +78,7 @@ class Menus:
         while True:
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"2.Consultar saldo ahorrado actual")
-            print(Style.BRIGHT +"3.Repartir saldo/mes por años")
+            print(Style.BRIGHT +"3.Repartir saldo/mes")
             print(Style.BRIGHT +"4.Saldo perdido por inflacion")
             print(Style.BRIGHT +"5.Volver \n")
 
@@ -131,11 +131,13 @@ class Menus:
     def menu_deudas(self):
         while True:
             cantidad = dao.finish_deudas(self.user)
-            print(f"\nTus deudas: {cantidad[0]}€\n")
+            saldo = dao.consultar_saldo_total(self.user)
+            print(f"\nTus deudas: {cantidad[0]}€")
+            print(f"Liquidando tus deudas con el ahorro, te quedas a: {saldo[0] - cantidad[0]:.2f}€ \n")
             print(Style.BRIGHT +"1.Metodo bola de nieve")
             print(Style.BRIGHT +"2.Metodo Avalancha")
             print(Style.BRIGHT +"3.Insertar Deuda")
-            print(Style.BRIGHT +"4.Actualizar cantidad_pagada")
+            print(Style.BRIGHT +"4.Actualizar Cantidad Pagada")
             print(Style.BRIGHT +"5.Salir \n")
 
             option = int(input("Escoge:"))
@@ -161,7 +163,7 @@ class Menus:
     def menu_inversion(self):
         while True:
             acciones = dao.ver_el_precio_actual(self.user)
-            EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "PORCENTAJE"]
+            EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
             print("\n"+tabulate(acciones, headers=EN, tablefmt="github"))
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
@@ -178,7 +180,7 @@ class Menus:
                 print(res)
             elif option == 2:
                 resultado = dao.read_inversiones(self.user)
-                headers = ["ID","SIGLAS","CANTIDAD","PRECIO"]
+                headers = ["ID","SIGLAS","CANTIDAD","PRECIO","VENTA"]
                 print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
             elif option == 4:
                 break
