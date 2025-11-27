@@ -3,6 +3,8 @@ import sqlite3
 import bcrypt
 from colorama import Fore,Back,Style,init
 import yfinance as yf
+import pandas as pd
+import requests 
 
 init(autoreset=True)
 
@@ -62,6 +64,24 @@ class DAOfinancial:
         dinero_mes = cantidad_2[0] / meses
 
         return float(dinero_mes)
+    
+    def inflacion_dinero(self,id,interes):
+        self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
+        resultado = self.cursor.fetchone()
+
+        response = requests.get("https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/24077")
+        data = response.json()
+
+        df = pd.DataFrame(data)
+        df_exp = pd.json_normalize(df['Data'][0])
+        df_exp.drop(columns=["Secreto", "FK_TipoDato","Fecha"], inplace=True)
+        df_exp['Periodo'] = df_exp['Anyo'].astype(str) + "-" + df_exp['FK_Periodo'].astype(str).str.zfill(2)
+        df_exp = df_exp.sort_values(['Anyo','FK_Periodo'])
+        df_exp['Inflacion_interanual'] = df_exp['Valor'].pct_change(12) * 100
+        df_final = df_exp[['Periodo','Inflacion_interanual']]
+        df_final.sort_index(inplace=True)
+        
+
     # Crud mas o menos de deuda
     def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
         try:
