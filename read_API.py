@@ -17,9 +17,9 @@ def grafica_inflacion():
     df_exp = df_exp.sort_values(['Anyo','FK_Periodo'])
     # Calculamos en una nueva columna la inflacio interanual
     df_exp['Inflacion_interanual'] = df_exp['Valor'].pct_change(12) * 100
-    
+    # Creamos un nuevo dataframe con los datos que nos interesan
     df_nuevo = pd.DataFrame(df_exp[['Periodo','Inflacion_interanual']])
-
+    # Por ultimo hacemos que solo sean dos decimales y ordenamos el indice
     df_nuevo["Inflacion_interanual"] = df_nuevo["Inflacion_interanual"].round(2)
     df_nuevo.sort_index(inplace=True)
 
