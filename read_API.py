@@ -23,4 +23,9 @@ def grafica_inflacion():
     df_nuevo["Inflacion_interanual"] = df_nuevo["Inflacion_interanual"].round(2)
     df_nuevo.sort_index(inplace=True)
 
-    print(df_nuevo.head(n=13))
+    inflacion = df_nuevo.head(n=13)
+
+    promedio = inflacion["Inflacion_interanual"].mean()
+
+    x = inflacion["Periodo"]
+    y = inflacion["Inflacion_interanual"]
