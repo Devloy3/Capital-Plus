@@ -1,5 +1,6 @@
 import pandas as pd
 import requests 
+import plotext as pl
 
 def grafica_inflacion():
     response = requests.get("https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/24077")
@@ -27,5 +28,11 @@ def grafica_inflacion():
 
     promedio = inflacion["Inflacion_interanual"].mean()
 
-    x = inflacion["Periodo"]
-    y = inflacion["Inflacion_interanual"]
+    x = inflacion["Periodo"].tolist()
+    y = inflacion["Inflacion_interanual"].tolist()
+
+    pl.plot(range(len(x)),y)
+    pl.title("Gráfico de Inflacion Anual")
+    pl.ylabel("Inflacion")
+    pl.xlabel("Mes-Año")
+    pl.show()
