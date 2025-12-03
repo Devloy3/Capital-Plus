@@ -65,8 +65,10 @@ class DAOfinancial:
         return float(dinero_mes)
     
     def inflacion_dinero(self,id,interes):
-        self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha ", (id,))
-        resultado = self.cursor.fetchall()
+        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
+        cantidad = self.cursor.fetchone()
+        
+
 
         
 
