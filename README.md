@@ -1,4 +1,4 @@
- ````
+
   ____            _ _        _   ____  _
  / ___|__ _ _ __ (_) |_ __ _| | |  _ \| |_   _ ___
 | |   / _` | '_ \| | __/ _` | | | |_) | | | | / __|
@@ -11,13 +11,13 @@ ver como van tus inversiones y la ganancia que puedes obtener por ellas.
 
 Características principales:
 
-- **Inversiones inteligentes**  
+- Inversiones inteligentes:
   Registra y consulta las ganancias que puedes ganar si vendes tus acciones (incluso una vez vendidas).
 
-- **Ahorro**  
+- Ahorro:
   Guarda un registro de tu ahorro y mira como vas avanzando con tu ahorro.
 
-- **Gestión de deudas**  
+- Gestión de deudas:  
   Controla tus préstamos, con intereses y decide que tipo de metodo de deuda quieres sacarte
 
 - **Seguridad**  
