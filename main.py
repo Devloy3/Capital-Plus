@@ -3,6 +3,8 @@ from getpass import getpass
 from calculadoras_finanzas import Finanzas
 from colorama import Fore,Back,Style,init
 from tabulate import tabulate
+import plotext as plt
+from datetime import datetime
 
 dao = DAOfinancial()
 init(autoreset=True)
@@ -79,7 +81,7 @@ class Menus:
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"2.Consultar saldo ahorrado actual")
             print(Style.BRIGHT +"3.Repartir saldo/mes")
-            print(Style.BRIGHT +"4.Saldo perdido por inflacion")
+            print(Style.BRIGHT +"4.Evolucion del Ahorro")
             print(Style.BRIGHT +"5.Volver \n")
 
             option = int(input("Escoge:"))
@@ -94,6 +96,17 @@ class Menus:
                 años = int(input("Meses:"))
                 cantidad = dao.tiempo_dinero_ahorrado(self.user,años)
                 print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
+            elif option == 4:
+                grafico = dao.grafico_de_ahorro(self.user)
+                cantidades = [fila[0] for fila in grafico]
+                fechas = [fila[1] for fila in grafico]
+                fechas_str = [datetime.strptime(f, "%Y/%m/%d") for f in fechas]
+                plt.plotsize(20,30)
+                plt.plot(list(range(len(fechas_str))),cantidades)
+                plt.xticks(list(range(len(fechas_str))), fechas_str)
+                plt.xlim(0,len(fechas))
+                plt.ylim(0,max(cantidades))
+                plt.show()
             elif option == 5:
                 break
 

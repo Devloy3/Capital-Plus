@@ -75,6 +75,11 @@ class DAOfinancial:
 
         return float(dinero_mes)
     
+    def grafico_de_ahorro(self,id):
+        self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha DESC", (id,))
+        fecha_cantidad = self.cursor.fetchall()
+        return fecha_cantidad
+    
     # ---------------------------------------------------------------
     # -------Debt(Create,Read,CreateMoneyDebt,MoneyReturned)---------
     # ---------------------------------------------------------------
