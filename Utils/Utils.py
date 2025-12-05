@@ -15,6 +15,7 @@ sql = """
                 siglas VARCHAR(10),
                 cantidad DECIMAL(5,2),
                 precio_compra DECIMAL(5,2),
+                precio_venta DECIMAL(5,2),
                 user INTEGER,
                 FOREIGN KEY (user) REFERENCES users(id)
             );
