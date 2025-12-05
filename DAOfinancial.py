@@ -12,6 +12,10 @@ class DAOfinancial:
         self.conn = sqlite3.connect('./db/financial.db')  # Crea el archivo si no existe
         self.cursor = self.conn.cursor()
 
+    # ------------------------------------
+    # -------USER(Register,Login)--------
+    # ------------------------------------
+
     def registrarse(self,user,contrasenya):
         password = contrasenya.encode("utf-8")
         salt = bcrypt.gensalt()
@@ -41,7 +45,11 @@ class DAOfinancial:
                 print(Fore.RED +"\nContrasenya Incorrecta")
         else:
             print(Fore.RED + "\nUsuario Incorrecto")
-    # ahrro registro
+    
+    # --------------------------------------------
+    # -------Saving(Create,Read,Saving/Time)-------
+    # --------------------------------------------
+
     def registrar_ahorro(self,dinero,id):
         fecha = date.today()
         fecha_string = fecha.strftime("%Y/%m/%d")
@@ -53,9 +61,12 @@ class DAOfinancial:
             print(f"No se ha insertado correctamente:{e}")
 
     def consultar_saldo_total(self,id):
-        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
-        cantidad = self.cursor.fetchone()
-        return cantidad
+        try:
+            self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
+            cantidad = self.cursor.fetchone()
+            return cantidad
+        except:
+            return None
     
     def tiempo_dinero_ahorrado(self,id,meses):
         self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
@@ -64,15 +75,10 @@ class DAOfinancial:
 
         return float(dinero_mes)
     
-    def inflacion_dinero(self,id,interes):
-        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
-        cantidad = self.cursor.fetchone()
-        
+    # ---------------------------------------------------------------
+    # -------Debt(Create,Read,CreateMoneyDebt,MoneyReturned)---------
+    # ---------------------------------------------------------------
 
-
-        
-
-    # Crud mas o menos de deuda
     def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
         try:
             self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, cantidad_total, interes, cantidad_pagada))
@@ -92,11 +98,14 @@ class DAOfinancial:
         return self.cursor.fetchall()
 
     def finish_deudas(self,id):
-        self.cursor.execute("""SELECT SUM(CASE 
-        WHEN interes != 0 THEN (cantidad_total * interes) - cantidad_pagada 
-        ELSE cantidad_total - cantidad_pagada 
-        END) AS Total FROM deudas WHERE user=?""",(id,))
-        return self.cursor.fetchone()
+        try: 
+            self.cursor.execute("""SELECT SUM(CASE 
+            WHEN interes != 0 THEN (cantidad_total * interes) - cantidad_pagada 
+            ELSE cantidad_total - cantidad_pagada 
+            END) AS Total FROM deudas WHERE user=?""",(id,))
+            return self.cursor.fetchone()
+        except:
+            return None
     
     def insertar_cantidad_pagada(self,cantidad,id):
         try:
@@ -108,7 +117,10 @@ class DAOfinancial:
             texto_2 = f"El error fue:{e}"
             return texto_2
     
-    # Crud mas o menos de Inversion
+    # ------------------------------------------------------------
+    # ---------Investment(Create,Read,Current_Price,Sell_Stock)----
+    # -------------------------------------------------------------
+
     def create_inversion(self, siglas, cantidad, precio_compra, id):
         try:
             self.cursor.execute("INSERT INTO inversiones(siglas, cantidad, precio_compra, user) VALUES (?, ?, ?, ?)", (siglas, cantidad, precio_compra, id))
