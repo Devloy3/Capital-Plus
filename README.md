@@ -19,8 +19,11 @@ Características principales:
 Instalación
 
 git clone https://github.com/tuusuario/capital-plus.git
+
 python3 -m venv .ent 
+
 python3 /Utils/Utils.py
+
 python3 main.py
 
    
