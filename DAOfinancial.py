@@ -142,15 +142,19 @@ class DAOfinancial:
     def ver_el_precio_actual(self,id):
         self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND precio_venta=0",(id,))
         resultado = self.cursor.fetchall()
-        lista = []
+        ListaTodo = []
+        GananciaTodo = []
 
         for siglas,cantidad,Precio in resultado:
-            accion = yf.Ticker(siglas)
-            dt_accion = accion.history(period="1mo", interval="1d")
-            precio_accion = dt_accion["Close"].iloc[-1]
-            precio_actual = precio_accion*cantidad
-            conversion = float(precio_actual)
-            ganancia =  conversion - Precio
-            lista.append((siglas,round(conversion,2), round(Precio,2), round(ganancia,2)))
-        
-        return lista
+            Accion = yf.Ticker(siglas)
+            DtAccion = Accion.history(period="1mo", interval="1d")
+            PrecioAccion = DtAccion["Close"].iloc[-1]
+            PrecioActual = PrecioAccion*cantidad
+            Conversion = float(PrecioActual)
+            Ganancia =  Conversion - Precio
+            GananciaTodo.append(Ganancia)
+            ListaTodo.append((siglas,round(Conversion,2), round(Precio,2), round(Ganancia,2)))
+
+        GananciaSuma = sum(GananciaTodo)
+
+        return ListaTodo, GananciaSuma
