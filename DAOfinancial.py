@@ -143,7 +143,6 @@ class DAOfinancial:
         self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND precio_venta=0",(id,))
         resultado = self.cursor.fetchall()
         ListaTodo = []
-        GananciaTodo = []
 
         for siglas,cantidad,Precio in resultado:
             Accion = yf.Ticker(siglas)
@@ -152,9 +151,9 @@ class DAOfinancial:
             PrecioActual = PrecioAccion*cantidad
             Conversion = float(PrecioActual)
             Ganancia =  Conversion - Precio
-            GananciaTodo.append(Ganancia)
             ListaTodo.append((siglas,round(Conversion,2), round(Precio,2), round(Ganancia,2)))
 
-        GananciaSuma = sum(GananciaTodo)
+        GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
+        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo)
 
-        return ListaTodo, GananciaSuma
+        return ListaTodo, GananciaSuma, Patrimonio

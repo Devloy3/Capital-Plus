@@ -181,10 +181,11 @@ class Menus:
 
     def menu_inversion(self):
         while True:
-            Acciones, GananciaTotal = dao.ver_el_precio_actual(self.user)
+            Acciones, GananciaTotal, Patrimonio = dao.ver_el_precio_actual(self.user)
             EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
             print("\n"+tabulate(Acciones, headers=EN, tablefmt="github"))
-            print(f"\n Ganancia Total: {GananciaTotal:.2f}")
+            print(f"\n Ganancia Total: {GananciaTotal:.2f}€")
+            print(F"Patrimonio Total Actual: {Patrimonio:.2f}€")
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
             print(Style.BRIGHT +"3.Vender Accion")
