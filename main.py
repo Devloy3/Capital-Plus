@@ -176,6 +176,11 @@ class Menus:
                 cantidad_pagada = float(input("Cantidad Pagada(sino 0.00):"))
                 resp = dao.create_deuda(self.user, descripcion, cantidad_total, interes, cantidad_pagada)
                 print(resp)
+            elif option == 4: 
+                id = int(input("Id deuda:"))
+                Cantidad = int(input("Introduce la cantidad pagada:"))
+                Verificador = dao.insertar_cantidad_pagada(Cantidad,id)
+                print(Verificador)
             elif option == 5:
                 break
 
@@ -184,7 +189,7 @@ class Menus:
             Acciones, GananciaTotal, Patrimonio = dao.ver_el_precio_actual(self.user)
             EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
             print("\n"+tabulate(Acciones, headers=EN, tablefmt="github"))
-            print(f"\n Ganancia Total: {GananciaTotal:.2f}€")
+            print(f"\nGanancia Total: {GananciaTotal:.2f}€")
             print(F"Patrimonio Total Actual: {Patrimonio:.2f}€")
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
@@ -201,8 +206,13 @@ class Menus:
                 print(res)
             elif option == 2:
                 resultado = dao.read_inversiones(self.user)
-                headers = ["ID","SIGLAS","CANTIDAD","PRECIO","VENTA"]
+                headers = ["ID","SIGLAS","CANTIDAD","PRECIO","PRECIO VENTA","VENTA"]
                 print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+            elif option == 3:
+                id = int(input("ID de la inversion:"))
+                PrecioVenta = float(input("Precio de venta (0.00):"))
+                Retorno = dao.sell_invesment(PrecioVenta,id)
+                print(Retorno)
             elif option == 4:
                 break
             

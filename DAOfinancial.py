@@ -116,7 +116,7 @@ class DAOfinancial:
         try:
             self.cursor.execute("UPDATE deudas SET cantidad_pagada=? WHERE id=?",(cantidad,id))
             self.conn.commit()
-            texto = f" Se actualizo la cantidad pagada"
+            texto = "Se actualizo la cantidad pagada"
             return texto
         except sqlite3.Error as e:
             texto_2 = f"El error fue:{e}"
@@ -136,11 +136,20 @@ class DAOfinancial:
             texto = f"el error ha sido: {e}"
 
     def read_inversiones(self,id):
-        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio,(cantidad*precio_venta-precio_compra) AS Venta FROM inversiones WHERE user=?", (id,))
+        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Venta FROM inversiones WHERE user=?", (id,))
         return self.cursor.fetchall()
     
+    def sell_invesment(self,PrecioVenta,idInversion):
+        try:
+            self.cursor.execute('UPDATE inversiones SET precio_venta=? WHERE id=?',(PrecioVenta,idInversion))
+            self.conn.commit()
+            texto = "Venta Insertada"
+            return texto
+        except sqlite3.Error as e:
+            texto = f"el error ha sido: {e}"
+
     def ver_el_precio_actual(self,id):
-        self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND precio_venta=0",(id,))
+        self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND (precio_venta=0 OR precio_venta IS NULL)",(id,))
         resultado = self.cursor.fetchall()
         ListaTodo = []
 
@@ -153,7 +162,10 @@ class DAOfinancial:
             Ganancia =  Conversion - Precio
             ListaTodo.append((siglas,round(Conversion,2), round(Precio,2), round(Ganancia,2)))
 
+        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
+        Ahorro = self.cursor.fetchone()
+
         GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
-        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo)
+        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro[0]
 
         return ListaTodo, GananciaSuma, Patrimonio
