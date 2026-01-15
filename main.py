@@ -79,7 +79,7 @@ class Menus:
     def menu_ahorro(self):
         while True:
             resultado = dao.consultar_saldo_total(self.user)
-            print(f"\nCantidad ahorrada total: {resultado[0]}€")
+            print(f"\nCantidad ahorrada total: {resultado}€")
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"3.Repartir saldo/mes")
             print(Style.BRIGHT +"4.Evolucion del Ahorro")

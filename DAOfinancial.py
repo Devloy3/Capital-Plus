@@ -64,7 +64,7 @@ class DAOfinancial:
         try:
             self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
             cantidad = self.cursor.fetchone()
-            return cantidad
+            return cantidad[0]
         except:
             return None
     
@@ -136,9 +136,17 @@ class DAOfinancial:
             texto = f"el error ha sido: {e}"
 
     def read_inversiones(self,id):
-        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Venta FROM inversiones WHERE user=?", (id,))
-        return self.cursor.fetchall()
-    
+        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Precio_Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Ganancia FROM inversiones WHERE user=?", (id,))
+        Inversiones = self.cursor.fetchall()
+        Inversiones2 = []
+
+        for i,siglas,cantidad,precio,precioventa,ganancia in Inversiones:
+            Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2),round(ganancia,2)))
+
+        return Inversiones2 
+
+
+
     def sell_invesment(self,PrecioVenta,idInversion):
         try:
             self.cursor.execute('UPDATE inversiones SET precio_venta=? WHERE id=?',(PrecioVenta,idInversion))
@@ -164,8 +172,9 @@ class DAOfinancial:
 
         self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
         Ahorro = self.cursor.fetchone()
+        Ahorro = Ahorro[0] if Ahorro else 0
 
         GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
-        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro[0]
+        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro
 
         return ListaTodo, GananciaSuma, Patrimonio
