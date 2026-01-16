@@ -218,7 +218,7 @@ class Menus:
                 print(Retorno)
             elif option == 4:
                 Monedas = dao.ConsultaMonedas(self.user)
-                headers = ["SIGLAS","CANTIDAD"]
+                headers = ["SIGLAS","CANTIDAD","EUROS"]
                 print("\n"+tabulate(Monedas, headers=headers, tablefmt="github"))
             elif option == 5:
                 print("\nTiene que ser las siglas de yahoo finance!!!\n")

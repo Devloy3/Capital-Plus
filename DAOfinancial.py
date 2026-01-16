@@ -181,33 +181,26 @@ class DAOfinancial:
         Ahorro = self.cursor.fetchone()
         Ahorro = Ahorro[0] if Ahorro else 0
 
-        Valor = self.ValorMonedas(id)
+        Valor = self.ConsultaMonedas(id)
         
         GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
-        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro + Valor
-        ValorAccion = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Valor
+        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro + sum(moneda[2] for moneda in Valor)
+        ValorAccion = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + sum(moneda[2] for moneda in Valor)
         
         return ListaTodo, GananciaSuma, Patrimonio, ValorAccion
     
     def ConsultaMonedas(self,id):
         self.cursor.execute("SELECT * FROM Monedas WHERE User_id=?",(id,))
         Monedas = self.cursor.fetchall()
-        return Monedas
-    
-    def ValorMonedas(self,id):
-        Monedas = self.ConsultaMonedas(id)
         ValorEuros = []
         
         for Valor in Monedas:
             Ticker = yf.Ticker(Valor[0])
             precio = Ticker.history(period="1d")["Close"].iloc[0]
             Euros = precio * Valor[1]
-            ValorEuros.append(Euros)
-
-        if not ValorEuros:
-            return 0
+            ValorEuros.append((Valor[0], round(Valor[1],2), round(Euros,2)))
         
-        return sum(ValorEuros)
+        return ValorEuros
 
 
 
