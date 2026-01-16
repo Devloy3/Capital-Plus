@@ -75,11 +75,11 @@ class DAOfinancial:
 
         return float(dinero_mes)
     
-    def grafico_de_ahorro(self,id):
+    def EvolucionAhorro(self,id):
         self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha DESC", (id,))
-        fecha_cantidad = self.cursor.fetchall()
-        return fecha_cantidad
-    
+        FechaCantidad = self.cursor.fetchall()
+        return FechaCantidad
+            
     # ---------------------------------------------------------------
     # -------Debt(Create,Read,CreateMoneyDebt,MoneyReturned)---------
     # ---------------------------------------------------------------
@@ -135,6 +135,15 @@ class DAOfinancial:
         except sqlite3.Error as e:
             texto = f"el error ha sido: {e}"
 
+    def CreateMoney(self,siglas,cantidad,id):
+        try:
+            self.cursor.execute("INSERT INTO Monedas(Tipo, Cantidad, User_id) VALUES (?, ?, ?)", (siglas, cantidad, id))
+            self.conn.commit()
+            texto = "Moneda Insertada"
+            return texto
+        except sqlite3.Error as e:
+            texto = f"el error ha sido: {e}"
+
     def read_inversiones(self,id):
         self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Precio_Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Ganancia FROM inversiones WHERE user=?", (id,))
         Inversiones = self.cursor.fetchall()
@@ -144,8 +153,6 @@ class DAOfinancial:
             Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2),round(ganancia,2)))
 
         return Inversiones2 
-
-
 
     def sell_invesment(self,PrecioVenta,idInversion):
         try:
@@ -174,7 +181,33 @@ class DAOfinancial:
         Ahorro = self.cursor.fetchone()
         Ahorro = Ahorro[0] if Ahorro else 0
 
+        Valor = self.ValorMonedas(id)
+        
         GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
-        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro
+        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro + Valor
+        ValorAccion = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Valor
+        
+        return ListaTodo, GananciaSuma, Patrimonio, ValorAccion
+    
+    def ConsultaMonedas(self,id):
+        self.cursor.execute("SELECT * FROM Monedas WHERE User_id=?",(id,))
+        Monedas = self.cursor.fetchall()
+        return Monedas
+    
+    def ValorMonedas(self,id):
+        Monedas = self.ConsultaMonedas(id)
+        ValorEuros = []
+        
+        for Valor in Monedas:
+            Ticker = yf.Ticker(Valor[0])
+            precio = Ticker.history(period="1d")["Close"].iloc[0]
+            Euros = precio * Valor[1]
+            ValorEuros.append(Euros)
 
-        return ListaTodo, GananciaSuma, Patrimonio
+        if not ValorEuros:
+            return 0
+        
+        return sum(ValorEuros)
+
+
+

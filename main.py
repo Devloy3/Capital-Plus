@@ -78,8 +78,15 @@ class Menus:
     
     def menu_ahorro(self):
         while True:
+            Patrimonio = dao.ver_el_precio_actual(self.user)
             resultado = dao.consultar_saldo_total(self.user)
-            print(f"\nCantidad ahorrada total: {resultado}€")
+            
+            if resultado == Patrimonio[2]: 
+                print(f"\nCantidad ahorrada total: {resultado}€")
+            elif resultado != Patrimonio[2]:
+                print(f"\nPatrimonio Total: {Patrimonio[2]:.2f}€")
+                print(f"Cantidad de Liquidez: {resultado}€")
+
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"3.Repartir saldo/mes")
             print(Style.BRIGHT +"4.Evolucion del Ahorro")
@@ -95,16 +102,9 @@ class Menus:
                 cantidad = dao.tiempo_dinero_ahorrado(self.user,años)
                 print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
             elif option == 4:
-                grafico = dao.grafico_de_ahorro(self.user)
-                cantidades = [fila[0] for fila in grafico]
-                fechas = [fila[1] for fila in grafico]
-                fechas_str = [datetime.strptime(f, "%Y/%m/%d") for f in fechas]
-                plt.plotsize(20,30)
-                plt.plot(list(range(len(fechas_str))),cantidades)
-                plt.xticks(list(range(len(fechas_str))), fechas_str)
-                plt.xlim(0,len(fechas))
-                plt.ylim(0,max(cantidades))
-                plt.show()
+                Evolucion = dao.EvolucionAhorro(self.user)
+                headers = ["CANTIDAD","FECHA"]
+                print("\n"+tabulate(Evolucion, headers=headers, tablefmt="github"))
             elif option == 5:
                 break
 
@@ -186,19 +186,22 @@ class Menus:
 
     def menu_inversion(self):
         while True:
-            Acciones, GananciaTotal, Patrimonio = dao.ver_el_precio_actual(self.user)
+            Acciones, GananciaTotal, _ , ValorAccion = dao.ver_el_precio_actual(self.user)
             EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
             print("\n"+tabulate(Acciones, headers=EN, tablefmt="github"))
             print(f"\nGanancia Total: {GananciaTotal:.2f}€")
-            print(F"Patrimonio Total Actual: {Patrimonio:.2f}€")
+            print(f"Valor del Portafolio: {ValorAccion:.2f}€")
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
             print(Style.BRIGHT +"3.Vender Accion")
-            print(Style.BRIGHT +"4.Salir\n")
+            print(Style.BRIGHT +"4.Consultar Criptomonedas o Monedas")
+            print(Style.BRIGHT +"5.Insertar Moneda")
+            print(Style.BRIGHT +"6.Salir\n")
                 
             option = int(input("Escoge:"))
                 
             if option== 1:
+                print("\nTiene que ser las siglas de yahoo finance!!!\n")
                 siglas = input("Siglas:")
                 precio_compra = float(input("Precio_de_Compra(sino 0.00):"))
                 cantidad = float(input("Cantidad(sino 0.00):"))
@@ -214,7 +217,18 @@ class Menus:
                 Retorno = dao.sell_invesment(PrecioVenta,id)
                 print(Retorno)
             elif option == 4:
+                Monedas = dao.ConsultaMonedas(self.user)
+                headers = ["SIGLAS","CANTIDAD"]
+                print("\n"+tabulate(Monedas, headers=headers, tablefmt="github"))
+            elif option == 5:
+                print("\nTiene que ser las siglas de yahoo finance!!!\n")
+                siglas = input("Siglas:")
+                cantidad = float(input("Cantidad(sino 0.00):"))
+                res = dao.CreateMoney(siglas,cantidad,self.user)
+                print(res)
+            elif option == 6:
                 break
+                
             
 
             

@@ -36,6 +36,13 @@ sql = """
                 cantidad_pagada DECIMAL(10,2) DEFAULT 0.00,
                 FOREIGN KEY (user) REFERENCES users(id)
             );
+
+            CREATE TABLE Monedas(
+                Tipo CHAR(10),
+                Cantidad INTEGER,
+                User_id INTEGER,
+                FOREIGN KEY (User_id) REFERENCES users(id)
+            );
 """
 
 cursor.executescript(sql)
