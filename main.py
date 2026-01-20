@@ -3,7 +3,6 @@ from getpass import getpass
 from calculadoras_finanzas import Finanzas
 from colorama import Fore,Back,Style,init
 from tabulate import tabulate
-import plotext as plt
 from datetime import datetime
 
 dao = DAOfinancial()
@@ -49,10 +48,9 @@ def interfaz(id):
         titulo()
         print(Style.BRIGHT + "\n1.Ahorro")
         print(Style.BRIGHT + "2.Inversiones")
-        print(Style.BRIGHT + "3.Hacienda")
-        print(Style.BRIGHT + "4.Deudas")
-        print(Style.BRIGHT + "5.Calculadoras")
-        print(Style.BRIGHT + "6.Cerrar Sesion \n")
+        print(Style.BRIGHT + "3.Deudas")
+        print(Style.BRIGHT + "4.Calculadoras")
+        print(Style.BRIGHT + "5.Cerrar Sesion \n")
 
         option = int(input("Escoge una opcion:"))
 
@@ -62,13 +60,13 @@ def interfaz(id):
         elif option == 2:
             inversiones = Menus(id)
             inversiones.menu_inversion()
-        elif option == 4:
+        elif option == 3:
             calculo = Menus(id)
             calculo.menu_deudas()
-        elif option == 5:
+        elif option == 4:
             calculo = Menus(id)
             calculo.menu_calculadoras()
-        elif option == 6:
+        elif option == 5:
             break
 
 class Menus:
@@ -88,24 +86,24 @@ class Menus:
                 print(f"Cantidad de Liquidez: {resultado}€")
 
             print(Style.BRIGHT +"\n1.Registrar Saldo")
-            print(Style.BRIGHT +"3.Repartir saldo/mes")
-            print(Style.BRIGHT +"4.Evolucion del Ahorro")
-            print(Style.BRIGHT +"5.Volver \n")
+            print(Style.BRIGHT +"2.Repartir saldo/mes")
+            print(Style.BRIGHT +"3.Evolucion del Ahorro")
+            print(Style.BRIGHT +"4.Volver \n")
 
             option = int(input("Escoge:"))
 
             if option == 1:
                 monto = float(input("Cantidad:"))
                 dao.registrar_ahorro(monto,self.user)
-            elif option == 3:
+            elif option == 2:
                 años = int(input("Meses:"))
                 cantidad = dao.tiempo_dinero_ahorrado(self.user,años)
                 print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
-            elif option == 4:
+            elif option == 3:
                 Evolucion = dao.EvolucionAhorro(self.user)
                 headers = ["CANTIDAD","FECHA"]
                 print("\n"+tabulate(Evolucion, headers=headers, tablefmt="github"))
-            elif option == 5:
+            elif option == 4:
                 break
 
     def menu_calculadoras(self):
