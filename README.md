@@ -127,6 +127,7 @@ y facilidad de uso.
 1. Bajarse el repositorio
   `git clone https://github.com/Devloy3/Capital-Plus.git`
   `cd Capital-Plus`
+  `mkdir db` 
 
 2. Crear un entorno 
   `python3 -m venv .venv`
