@@ -140,16 +140,11 @@ class Menus:
     def menu_deudas(self):
         while True:
             cantidad = dao.finish_deudas(self.user)
-            saldo = dao.consultar_saldo_total(self.user)
+            
             if cantidad != None:
                 print(f"\nTus deudas: {cantidad[0]}€")
             else:
                 print("\nNo hay deudas")
-            
-            if cantidad is None or saldo is None:
-                print("No hay ningun ahorro registrado\n")
-            else:
-                print(f"Liquidando tus deudas con el ahorro, te quedas a: {saldo[0] - cantidad[0]:.2f}€ \n")
             
             print(Style.BRIGHT +"1.Metodo bola de nieve")
             print(Style.BRIGHT +"2.Metodo Avalancha")
