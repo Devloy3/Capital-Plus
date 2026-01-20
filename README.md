@@ -129,15 +129,19 @@ y facilidad de uso.
   ´´git clone https://github.com/Devloy3/Capital-Plus.git
     cd Capital-Plus 
   ´´
+
 2. Crear un entorno 
   ´ python3 -m venv .venv ´
+
 3. Instalar dependencias
   ´ pip install -r requirements.txt´
+
 4. Crear base de datos
   
   ´´ cd Utils
       python3 Utils.py
   ´´
+
 5. Arrancar el programa 
   
   ´´ cd ..
@@ -159,5 +163,3 @@ se desean implementar en futuras actualizaciones, como:
 - Crear un submodulo de Capital Plus, que sea para autonomos.
 
 Estas mejoras no afectan al funcionamiento actual, pero permitirán ampliar las capacidades de la aplicación en próximas versiones.
-
-
