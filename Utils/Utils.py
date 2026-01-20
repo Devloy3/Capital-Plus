@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('financial.db')  
+conn = sqlite3.connect('../db/financial.db')  
 cursor = conn.cursor()
 
 sql = """
