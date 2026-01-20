@@ -79,11 +79,13 @@ class Menus:
             Patrimonio = dao.ver_el_precio_actual(self.user)
             resultado = dao.consultar_saldo_total(self.user)
             
-            if resultado == Patrimonio[2]: 
-                print(f"\nCantidad ahorrada total: {resultado}€")
-            elif resultado != Patrimonio[2]:
+            if Patrimonio[2] == 0 and resultado == 0: 
+                print("\nNo hay nada en la base de datos")
+            elif Patrimonio[2] != resultado:
                 print(f"\nPatrimonio Total: {Patrimonio[2]:.2f}€")
                 print(f"Cantidad de Liquidez: {resultado}€")
+            else:
+                print(f"\nCantidad ahorrada total: {resultado}€")
 
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"2.Repartir saldo/mes")
@@ -141,10 +143,10 @@ class Menus:
         while True:
             cantidad = dao.finish_deudas(self.user)
             
-            if cantidad != None:
-                print(f"\nTus deudas: {cantidad[0]}€")
+            if cantidad[0] != None:
+                print(f"\nTus deudas: {cantidad[0]}€\n")
             else:
-                print("\nNo hay deudas")
+                print("\nNo hay deudas\n")
             
             print(Style.BRIGHT +"1.Metodo bola de nieve")
             print(Style.BRIGHT +"2.Metodo Avalancha")
@@ -180,10 +182,15 @@ class Menus:
     def menu_inversion(self):
         while True:
             Acciones, GananciaTotal, _ , ValorAccion = dao.ver_el_precio_actual(self.user)
-            EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
-            print("\n"+tabulate(Acciones, headers=EN, tablefmt="github"))
-            print(f"\nGanancia Total: {GananciaTotal:.2f}€")
-            print(f"Valor del Portafolio: {ValorAccion:.2f}€")
+            
+            if ValorAccion == 0.00 and GananciaTotal == 0.00:
+                print("\nNo hay nada en la base de datos")
+            else:
+                EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
+                print("\n"+tabulate(Acciones, headers=EN, tablefmt="github"))
+                print(f"\nGanancia Total: {GananciaTotal:.2f}€")
+                print(f"Valor del Portafolio: {ValorAccion:.2f}€")
+            
             print(Style.BRIGHT +"\n1.Insertar Inversion")
             print(Style.BRIGHT +"2.Que inversiones tengo?")
             print(Style.BRIGHT +"3.Vender Accion")

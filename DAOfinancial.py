@@ -66,7 +66,7 @@ class DAOfinancial:
             cantidad = self.cursor.fetchone()
             return cantidad[0]
         except:
-            return None
+            return 0
     
     def tiempo_dinero_ahorrado(self,id,meses):
         self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
