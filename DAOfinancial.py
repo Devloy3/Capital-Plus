@@ -56,7 +56,7 @@ class DAOfinancial:
         try:
             self.cursor.execute("INSERT INTO ahorro(fecha,cantidad,user) VALUES (?,?,?)", (fecha_string,dinero,id))
             self.conn.commit()
-            print("Se ha insertado perfectamente")
+            print(Fore.GREEN + "\nSe ha insertado perfectamente")
         except sqlite3.Error as e:
             print(f"No se ha insertado correctamente:{e}")
 
@@ -64,21 +64,33 @@ class DAOfinancial:
         try:
             self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
             cantidad = self.cursor.fetchone()
+            
+            if cantidad is None:
+                return 0
+            
             return cantidad[0]
-        except:
+        except Exception:
             return 0
     
     def tiempo_dinero_ahorrado(self,id,meses):
-        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
-        cantidad_2 = self.cursor.fetchone()
-        dinero_mes = cantidad_2[0] / meses
-
-        return float(dinero_mes)
+        try:
+            self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
+            cantidad = self.cursor.fetchone()
+            
+            if cantidad is None:
+                return 0
+            
+            DineroMes = cantidad[0] / meses
+            return float(DineroMes)
+        except Exception:
+            return 0
     
     def EvolucionAhorro(self,id):
-        self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha DESC", (id,))
-        FechaCantidad = self.cursor.fetchall()
-        return FechaCantidad
+        try:
+            self.cursor.execute("SELECT cantidad,fecha FROM ahorro WHERE user=? ORDER BY fecha DESC", (id,))
+            return self.cursor.fetchall()
+        except Exception:
+            return None
             
     # ---------------------------------------------------------------
     # -------Debt(Create,Read,CreateMoneyDebt,MoneyReturned)---------
@@ -95,22 +107,36 @@ class DAOfinancial:
             return texto
     
     def metodo_bola_de_nieve(self,id):
-        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
-        return self.cursor.fetchall()
-    
-    def metodo_avalancha(self,id):
-        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes DESC",(id,))
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
+            return self.cursor.fetchall()
+        except:
+            return None
 
+
+    def metodo_avalancha(self,id):
+        try:
+            self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes DESC",(id,))
+            return self.cursor.fetchall()
+        except:
+            return None
+    
     def finish_deudas(self,id):
         try: 
             self.cursor.execute("""SELECT SUM(CASE 
             WHEN interes != 0 THEN (cantidad_total * interes) - cantidad_pagada 
             ELSE cantidad_total - cantidad_pagada 
             END) AS Total FROM deudas WHERE user=?""",(id,))
-            return self.cursor.fetchone()
-        except:
-            return None
+            
+            DeudaTotal = self.cursor.fetchone()
+            
+            if DeudaTotal[0] is None:
+                return 0
+            
+            return DeudaTotal[0]
+        
+        except Exception:
+            return 0
     
     def insertar_cantidad_pagada(self,cantidad,id):
         try:
@@ -143,16 +169,23 @@ class DAOfinancial:
             return texto
         except sqlite3.Error as e:
             texto = f"el error ha sido: {e}"
+            return texto
 
     def read_inversiones(self,id):
-        self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Precio_Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Ganancia FROM inversiones WHERE user=?", (id,))
-        Inversiones = self.cursor.fetchall()
-        Inversiones2 = []
+        try:
+            self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Precio_Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Ganancia FROM inversiones WHERE user=?", (id,))
+            Inversiones = self.cursor.fetchall()
+            Inversiones2 = []
 
-        for i,siglas,cantidad,precio,precioventa,ganancia in Inversiones:
-            Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2),round(ganancia,2)))
-
-        return Inversiones2 
+            for i,siglas,cantidad,precio,precioventa,ganancia in Inversiones:
+                if precioventa is None:
+                    Inversiones2.append((i,siglas,cantidad,round(precio,2), 0.00 , 0.00))
+                else:
+                    Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2), round(ganancia,2))) 
+        
+            return Inversiones2
+        except Exception:
+            return None
 
     def sell_invesment(self,PrecioVenta,idInversion):
         try:
@@ -169,23 +202,28 @@ class DAOfinancial:
         ListaTodo = []
 
         for siglas,cantidad,Precio in resultado:
-            Accion = yf.Ticker(siglas)
-            DtAccion = Accion.history(period="1mo", interval="1d")
-            PrecioAccion = DtAccion["Close"].iloc[-1]
-            PrecioActual = PrecioAccion*cantidad
-            Conversion = float(PrecioActual)
-            Ganancia =  Conversion - Precio
-            ListaTodo.append((siglas,round(Conversion,2), round(Precio,2), round(Ganancia,2)))
-
-        self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
-        Ahorro = self.cursor.fetchone()
-        Ahorro = Ahorro[0] if Ahorro else 0
-
+            try:  
+                Accion = yf.Ticker(siglas)
+                DtAccion = Accion.history(period="1mo", interval="1d")
+            
+                if DtAccion.empty:
+                    PrecioAccion = 0
+                else:
+                    PrecioAccion = DtAccion["Close"].iloc[-1]
+            
+                PrecioActual = PrecioAccion*cantidad
+                Conversion = float(PrecioActual)
+                Ganancia =  Conversion - Precio
+                ListaTodo.append((siglas,round(Conversion,2), round(Precio,2), round(Ganancia,2)))
+            except:
+                continue
+        
+        Ahorro = self.consultar_saldo_total(id)
         Valor = self.ConsultaMonedas(id)
         
-        GananciaSuma = sum(ganancia for siglas,conversion,precio,ganancia in ListaTodo)
-        Patrimonio = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + Ahorro + sum(moneda[2] for moneda in Valor)
-        ValorAccion = sum(conversion for siglas,conversion,precio,ganancia in ListaTodo) + sum(moneda[2] for moneda in Valor)
+        GananciaSuma = sum(ganancia for _,_,_,ganancia in ListaTodo)
+        Patrimonio = sum(conversion for _,conversion,_,_ in ListaTodo) + Ahorro + sum(moneda[2] for moneda in Valor)
+        ValorAccion = sum(conversion for _,conversion,_,_ in ListaTodo) + sum(moneda[2] for moneda in Valor)
         
         return ListaTodo, GananciaSuma, Patrimonio, ValorAccion
     
@@ -195,10 +233,18 @@ class DAOfinancial:
         ValorEuros = []
         
         for Valor in Monedas:
-            Ticker = yf.Ticker(Valor[0])
-            precio = Ticker.history(period="1d")["Close"].iloc[0]
-            Euros = precio * Valor[1]
-            ValorEuros.append((Valor[0], round(Valor[1],2), round(Euros,2)))
+            try:
+                Ticker = yf.Ticker(Valor[0])
+                precio = Ticker.history(period="1d")["Close"].iloc[0]
+                
+                if precio.empty:
+                    Euros = 0
+                else:
+                    Euros = precio * Valor[1]
+                
+                ValorEuros.append((Valor[0], round(Valor[1],2), round(Euros,2)))
+            except:
+                continue
         
         return ValorEuros
 

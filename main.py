@@ -77,15 +77,15 @@ class Menus:
     def menu_ahorro(self):
         while True:
             Patrimonio = dao.ver_el_precio_actual(self.user)
-            resultado = dao.consultar_saldo_total(self.user)
+            Resultado = dao.consultar_saldo_total(self.user)
             
-            if Patrimonio[2] == 0 and resultado == 0: 
+            if Patrimonio[2] == 0 and Resultado == 0: 
                 print("\nNo hay nada en la base de datos")
-            elif Patrimonio[2] != resultado:
+            elif Patrimonio[2] != Resultado:
                 print(f"\nPatrimonio Total: {Patrimonio[2]:.2f}€")
-                print(f"Cantidad de Liquidez: {resultado}€")
+                print(f"Cantidad de Liquidez: {Resultado}€")
             else:
-                print(f"\nCantidad ahorrada total: {resultado}€")
+                print(f"\nCantidad ahorrada total: {Resultado}€")
 
             print(Style.BRIGHT +"\n1.Registrar Saldo")
             print(Style.BRIGHT +"2.Repartir saldo/mes")
@@ -103,8 +103,13 @@ class Menus:
                 print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
             elif option == 3:
                 Evolucion = dao.EvolucionAhorro(self.user)
-                headers = ["CANTIDAD","FECHA"]
-                print("\n"+tabulate(Evolucion, headers=headers, tablefmt="github"))
+                
+                if not Evolucion:
+                    print("No hay Datos")
+                else: 
+                    headers = ["CANTIDAD","FECHA"]
+                    print("\n"+tabulate(Evolucion, headers=headers, tablefmt="github"))
+            
             elif option == 4:
                 break
 
@@ -141,10 +146,14 @@ class Menus:
 
     def menu_deudas(self):
         while True:
-            cantidad = dao.finish_deudas(self.user)
+            Cantidad = dao.finish_deudas(self.user)
+            Ahorro = dao.consultar_saldo_total(self.user)
             
-            if cantidad[0] != None:
-                print(f"\nTus deudas: {cantidad[0]}€\n")
+            if Cantidad != 0 and Ahorro != 0:
+                print(f"\nSuma de Deudas: {Cantidad}€")
+                print(f"Deudas - Ahorro:{float(Ahorro - Cantidad):.2f}€\n")
+            elif Cantidad != 0:
+                print(f"\nSuma de Deudas: {Cantidad}€\n")
             else:
                 print("\nNo hay deudas\n")
             
@@ -157,13 +166,23 @@ class Menus:
             option = int(input("Escoge:"))
             
             if option== 1:
-                resultado = dao.metodo_bola_de_nieve(self.user)
-                headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
-                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+                Resultado = dao.metodo_bola_de_nieve(self.user)
+                
+                if not Resultado:
+                    print(Fore.RED + "No hay Datos")
+                else:
+                    headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
+                    print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
+            
             elif option == 2:
-                resultado = dao.metodo_avalancha(self.user)
-                headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
-                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
+                Resultado = dao.metodo_avalancha(self.user)
+                
+                if not Resultado:
+                    print(Fore.RED + "No hay Datos")
+                else:
+                    headers = ["ID","DESCRIPCION","CANTIDAD TOTAL","CANTIDAD PAGADA","INTERESES"]
+                    print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
+            
             elif option == 3:
                 descripcion = input("Descripcion:")
                 cantidad_total = float(input("Cantidad Total:"))
@@ -183,7 +202,7 @@ class Menus:
         while True:
             Acciones, GananciaTotal, _ , ValorAccion = dao.ver_el_precio_actual(self.user)
             
-            if ValorAccion == 0.00 and GananciaTotal == 0.00:
+            if ValorAccion == 0 and GananciaTotal == 0:
                 print("\nNo hay nada en la base de datos")
             else:
                 EN = ["SIGLAS", "PRECIO ACTUAL", "PRECIO DE COMPRA", "GANANCIA"]
@@ -192,10 +211,10 @@ class Menus:
                 print(f"Valor del Portafolio: {ValorAccion:.2f}€")
             
             print(Style.BRIGHT +"\n1.Insertar Inversion")
-            print(Style.BRIGHT +"2.Que inversiones tengo?")
-            print(Style.BRIGHT +"3.Vender Accion")
+            print(Style.BRIGHT +"2.Insertar Moneda")
+            print(Style.BRIGHT +"3.Consultar Inversiones")
             print(Style.BRIGHT +"4.Consultar Criptomonedas o Monedas")
-            print(Style.BRIGHT +"5.Insertar Moneda")
+            print(Style.BRIGHT +"5.Venta de Accion")
             print(Style.BRIGHT +"6.Salir\n")
                 
             option = int(input("Escoge:"))
@@ -207,20 +226,30 @@ class Menus:
                 cantidad = float(input("Cantidad(sino 0.00):"))
                 res = dao.create_inversion(siglas,cantidad,precio_compra,self.user)
                 print(res)
-            elif option == 2:
-                resultado = dao.read_inversiones(self.user)
-                headers = ["ID","SIGLAS","CANTIDAD","PRECIO","PRECIO VENTA","VENTA"]
-                print("\n"+tabulate(resultado, headers=headers, tablefmt="github"))
             elif option == 3:
+                Resultado = dao.read_inversiones(self.user)
+
+                if not Resultado:
+                    print(Fore.RED + "No hay Datos")
+                else:
+                    headers = ["ID","SIGLAS","CANTIDAD","PRECIO","PRECIO VENTA","VENTA"]
+                    print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
+            
+            elif option == 5:
                 id = int(input("ID de la inversion:"))
                 PrecioVenta = float(input("Precio de venta (0.00):"))
                 Retorno = dao.sell_invesment(PrecioVenta,id)
                 print(Retorno)
             elif option == 4:
                 Monedas = dao.ConsultaMonedas(self.user)
-                headers = ["SIGLAS","CANTIDAD","EUROS"]
-                print("\n"+tabulate(Monedas, headers=headers, tablefmt="github"))
-            elif option == 5:
+                
+                if not Monedas:
+                    print(Fore.RED + "No hay Datos")
+                else:
+                    headers = ["SIGLAS","CANTIDAD","EUROS"]
+                    print("\n"+tabulate(Monedas, headers=headers, tablefmt="github"))
+            
+            elif option == 2:
                 print("\nTiene que ser las siglas de yahoo finance!!!\n")
                 siglas = input("Siglas:")
                 cantidad = float(input("Cantidad(sino 0.00):"))
