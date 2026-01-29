@@ -15,7 +15,7 @@ sql = """
                 siglas VARCHAR(10),
                 cantidad DECIMAL(5,2),
                 precio_compra DECIMAL(5,2),
-                precio_venta DECIMAL(5,2),
+                precio_venta DECIMAL(5,2) DEFAULT 0.00,
                 user INTEGER,
                 FOREIGN KEY (user) REFERENCES users(id)
             );
@@ -39,7 +39,7 @@ sql = """
 
             CREATE TABLE Monedas(
                 Tipo CHAR(10),
-                Cantidad INTEGER,
+                Cantidad DECIMAL(5,2),
                 User_id INTEGER,
                 FOREIGN KEY (User_id) REFERENCES users(id)
             );

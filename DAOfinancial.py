@@ -98,7 +98,8 @@ class DAOfinancial:
 
     def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
         try:
-            self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, cantidad_total, interes, cantidad_pagada))
+            CantidadTotalIntereses = cantidad_total * interes
+            self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, CantidadTotalIntereses, interes, cantidad_pagada))
             self.conn.commit()
             intento = "Se inserto correctamente"
             return intento
@@ -109,24 +110,43 @@ class DAOfinancial:
     def metodo_bola_de_nieve(self,id):
         try:
             self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
-            return self.cursor.fetchall()
-        except:
+            BolaNieve = self.cursor.fetchall()
+            BolaNieve2 = []
+            
+            for Valor in BolaNieve:
+                Resto = Valor[2] - Valor[3]
+
+                if Resto <= 0:
+                    return None
+
+                BolaNieve2.append((Valor))
+
+            return BolaNieve2
+        except Exception:
             return None
 
 
     def metodo_avalancha(self,id):
         try:
-            self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes DESC",(id,))
-            return self.cursor.fetchall()
+            self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
+            Avalancha = self.cursor.fetchall()
+            Avalancha2 = []
+            
+            for Valor in Avalancha:
+                Resto = Valor[2] - Valor[3]
+
+                if Resto <= 0:
+                    return None
+
+                Avalancha2.append((Valor))
+
+            return Avalancha2
         except:
             return None
     
     def finish_deudas(self,id):
         try: 
-            self.cursor.execute("""SELECT SUM(CASE 
-            WHEN interes != 0 THEN (cantidad_total * interes) - cantidad_pagada 
-            ELSE cantidad_total - cantidad_pagada 
-            END) AS Total FROM deudas WHERE user=?""",(id,))
+            self.cursor.execute("SELECT SUM(cantidad_total - cantidad_pagada) AS Total FROM deudas WHERE user=?",(id,))
             
             DeudaTotal = self.cursor.fetchone()
             
@@ -178,10 +198,7 @@ class DAOfinancial:
             Inversiones2 = []
 
             for i,siglas,cantidad,precio,precioventa,ganancia in Inversiones:
-                if precioventa is None:
-                    Inversiones2.append((i,siglas,cantidad,round(precio,2), 0.00 , 0.00))
-                else:
-                    Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2), round(ganancia,2))) 
+               Inversiones2.append((i,siglas,cantidad,round(precio,2), round(precioventa,2), round(ganancia,2))) 
         
             return Inversiones2
         except Exception:
