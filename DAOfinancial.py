@@ -50,17 +50,17 @@ class DAOfinancial:
     # -------Saving(Create,Read,Saving/Time)-------
     # --------------------------------------------
 
-    def registrar_ahorro(self,dinero,id):
+    def RegistroAhorro(self,dinero,id):
         fecha = date.today()
         fecha_string = fecha.strftime("%Y/%m/%d")
         try:
             self.cursor.execute("INSERT INTO ahorro(fecha,cantidad,user) VALUES (?,?,?)", (fecha_string,dinero,id))
             self.conn.commit()
-            print(Fore.GREEN + "\nSe ha insertado perfectamente")
+            return Fore.GREEN + "\nSe ha insertado perfectamente"
         except sqlite3.Error as e:
-            print(f"No se ha insertado correctamente:{e}")
+            return f"{e}"
 
-    def consultar_saldo_total(self,id):
+    def SaldoTotal(self,id):
         try:
             self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC, cantidad DESC LIMIT 1", (id,))
             cantidad = self.cursor.fetchone()
@@ -72,7 +72,7 @@ class DAOfinancial:
         except Exception:
             return 0
     
-    def tiempo_dinero_ahorrado(self,id,meses):
+    def TiempoDinero(self,id,meses):
         try:
             self.cursor.execute("SELECT cantidad FROM ahorro WHERE user=? ORDER BY fecha DESC LIMIT 1", (id,))
             cantidad = self.cursor.fetchone()
@@ -96,18 +96,20 @@ class DAOfinancial:
     # -------Debt(Create,Read,CreateMoneyDebt,MoneyReturned)---------
     # ---------------------------------------------------------------
 
-    def create_deuda(self, id, descripcion, cantidad_total, interes, cantidad_pagada):
+    def CreateDeuda(self, id, descripcion, cantidad_total, interes):
         try:
-            CantidadTotalIntereses = cantidad_total * interes
-            self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes, cantidad_pagada) VALUES (?, ?, ?, ?, ?)", (id, descripcion, CantidadTotalIntereses, interes, cantidad_pagada))
+            if interes > 0:
+                CantidadTotalIntereses = cantidad_total * interes
+            else:
+                CantidadTotalIntereses = cantidad_total 
+            
+            self.cursor.execute("INSERT INTO deudas(user, descripcion, cantidad_total, interes) VALUES (?, ?, ?, ?)", (id, descripcion, CantidadTotalIntereses, interes))
             self.conn.commit()
-            intento = "Se inserto correctamente"
-            return intento
+            return Fore.GREEN +"Se inserto correctamente"
         except sqlite3.Error as e:
-            texto = f"El Error ha sido:{e}"
-            return texto
+            return f"{e}"
     
-    def metodo_bola_de_nieve(self,id):
+    def BolaNieve(self,id):
         try:
             self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY cantidad_total ASC",(id,))
             BolaNieve = self.cursor.fetchall()
@@ -116,17 +118,15 @@ class DAOfinancial:
             for Valor in BolaNieve:
                 Resto = Valor[2] - Valor[3]
 
-                if Resto <= 0:
-                    return None
-
-                BolaNieve2.append((Valor))
+                if Resto > 0:
+                    BolaNieve2.append((Valor))
 
             return BolaNieve2
         except Exception:
             return None
 
 
-    def metodo_avalancha(self,id):
+    def Avalancha(self,id):
         try:
             self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
             Avalancha = self.cursor.fetchall()
@@ -135,16 +135,14 @@ class DAOfinancial:
             for Valor in Avalancha:
                 Resto = Valor[2] - Valor[3]
 
-                if Resto <= 0:
-                    return None
-
-                Avalancha2.append((Valor))
+                if Resto > 0:
+                    Avalancha2.append((Valor))
 
             return Avalancha2
         except:
             return None
     
-    def finish_deudas(self,id):
+    def FinishDeudas(self,id):
         try: 
             self.cursor.execute("SELECT SUM(cantidad_total - cantidad_pagada) AS Total FROM deudas WHERE user=?",(id,))
             
@@ -158,40 +156,35 @@ class DAOfinancial:
         except Exception:
             return 0
     
-    def insertar_cantidad_pagada(self,cantidad,id):
+    def CantidadPagada(self,cantidad,id):
         try:
             self.cursor.execute("UPDATE deudas SET cantidad_pagada=? WHERE id=?",(cantidad,id))
             self.conn.commit()
-            texto = "Se actualizo la cantidad pagada"
-            return texto
+            return Fore.GREEN + "\nSe actualizo perfectamente" 
         except sqlite3.Error as e:
-            texto_2 = f"El error fue:{e}"
-            return texto_2
+            return f"{e}"
     
     # ------------------------------------------------------------
     # ---------Investment(Create,Read,Current_Price,Sell_Stock)----
     # -------------------------------------------------------------
 
-    def create_inversion(self, siglas, cantidad, precio_compra, id):
+    def CreateInversion(self, siglas, cantidad, precio_compra, id):
         try:
             self.cursor.execute("INSERT INTO inversiones(siglas, cantidad, precio_compra, user) VALUES (?, ?, ?, ?)", (siglas, cantidad, precio_compra, id))
             self.conn.commit()
-            texto = "Inversion Insertada"
-            return texto
+            return Fore.GREEN + "\nSe ha insertado perfectamente"
         except sqlite3.Error as e:
-            texto = f"el error ha sido: {e}"
+            return f"{e}"
 
     def CreateMoney(self,siglas,cantidad,id):
         try:
             self.cursor.execute("INSERT INTO Monedas(Tipo, Cantidad, User_id) VALUES (?, ?, ?)", (siglas, cantidad, id))
             self.conn.commit()
-            texto = "Moneda Insertada"
-            return texto
+            return Fore.GREEN + "\nSe ha insertado perfectamente"
         except sqlite3.Error as e:
-            texto = f"el error ha sido: {e}"
-            return texto
+            return f"{e}"
 
-    def read_inversiones(self,id):
+    def ReadInversiones(self,id):
         try:
             self.cursor.execute("SELECT id,siglas,cantidad,(cantidad*precio_compra) AS Precio, (cantidad*precio_venta) AS Precio_Venta, (cantidad*precio_venta-cantidad*precio_compra) AS Ganancia FROM inversiones WHERE user=?", (id,))
             Inversiones = self.cursor.fetchall()
@@ -204,16 +197,15 @@ class DAOfinancial:
         except Exception:
             return None
 
-    def sell_invesment(self,PrecioVenta,idInversion):
+    def SellInvesment(self,precioventa,idinversion):
         try:
-            self.cursor.execute('UPDATE inversiones SET precio_venta=? WHERE id=?',(PrecioVenta,idInversion))
+            self.cursor.execute('UPDATE inversiones SET precio_venta=? WHERE id=?',(precioventa,idinversion))
             self.conn.commit()
-            texto = "Venta Insertada"
-            return texto
+            return Fore.GREEN + "\nSe ha insertado perfectamente"
         except sqlite3.Error as e:
-            texto = f"el error ha sido: {e}"
+            return f"{e}"
 
-    def ver_el_precio_actual(self,id):
+    def PrecioActual(self,id):
         self.cursor.execute("SELECT siglas,cantidad,(cantidad*precio_compra) AS Precio FROM inversiones WHERE user=? AND (precio_venta=0 OR precio_venta IS NULL)",(id,))
         resultado = self.cursor.fetchall()
         ListaTodo = []
@@ -235,7 +227,7 @@ class DAOfinancial:
             except:
                 continue
         
-        Ahorro = self.consultar_saldo_total(id)
+        Ahorro = self.SaldoTotal(id)
         Valor = self.ConsultaMonedas(id)
         
         GananciaSuma = sum(ganancia for _,_,_,ganancia in ListaTodo)

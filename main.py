@@ -5,7 +5,7 @@ from colorama import Fore,Back,Style,init
 from tabulate import tabulate
 from datetime import datetime
 
-dao = DAOfinancial()
+Dao = DAOfinancial()
 init(autoreset=True)
 
 def titulo():
@@ -31,14 +31,14 @@ def menu():
         if opcion == 1:
             usuario = input("Usuario: ")
             contrasenya = getpass("Contrasenya:")
-            usuario_id = dao.iniciar_sesion(usuario, contrasenya)
+            usuario_id = Dao.iniciar_sesion(usuario, contrasenya)
 
             if usuario_id:
                 interfaz(usuario_id)
         elif opcion == 2:
             r_usuario = input("Registrar Usuario: ")
             r_contrasenya = getpass("Registrar Contrasenya: ")
-            resultado = dao.registrarse(r_usuario, r_contrasenya)
+            resultado = Dao.registrarse(r_usuario, r_contrasenya)
             print(Fore.GREEN + resultado)
         elif opcion == 3:
             break
@@ -77,8 +77,8 @@ class Menus:
     
     def menu_ahorro(self):
         while True:
-            Patrimonio = dao.ver_el_precio_actual(self.user)
-            Resultado = dao.consultar_saldo_total(self.user)
+            Patrimonio = Dao.PrecioActual(self.user)
+            Resultado = Dao.SaldoTotal(self.user)
             
             if Patrimonio[2] == 0 and Resultado == 0: 
                  print(Fore.RED + Style.BRIGHT + "\nNo hay datos")
@@ -96,14 +96,15 @@ class Menus:
             option = int(input("Escoge:"))
 
             if option == 1:
-                monto = float(input("Cantidad(sino 0.00):"))
-                dao.registrar_ahorro(monto,self.user)
+                Monto = float(input("Cantidad(sino 0.00):"))
+                Res = Dao.RegistroAhorro(Monto,self.user)
+                print(Res)
             elif option == 2:
-                años = int(input("Meses:"))
-                cantidad = dao.tiempo_dinero_ahorrado(self.user,años)
-                print(f"\nSaldo que se puede gastar cada mes durante {float(años/12):.2f} años es: {int(cantidad)}€")
+                Años = int(input("Meses:"))
+                Cantidad = Dao.TiempoDinero(self.user,Años)
+                print(f"\nSaldo que se puede gastar cada mes durante {float(Años/12):.2f} años es de: {int(Cantidad)}€")
             elif option == 3:
-                Evolucion = dao.EvolucionAhorro(self.user)
+                Evolucion = Dao.EvolucionAhorro(self.user)
                 
                 if not Evolucion:
                    pass
@@ -147,8 +148,8 @@ class Menus:
 
     def menu_deudas(self):
         while True:
-            Cantidad = dao.finish_deudas(self.user)
-            Ahorro = dao.consultar_saldo_total(self.user)
+            Cantidad = Dao.FinishDeudas(self.user)
+            Ahorro = Dao.SaldoTotal(self.user)
             
             if Cantidad != 0 and Ahorro != 0:
                 Resto = Ahorro - Cantidad
@@ -174,7 +175,7 @@ class Menus:
             option = int(input("Escoge:"))
             
             if option== 1:
-                Resultado = dao.metodo_bola_de_nieve(self.user)
+                Resultado = Dao.BolaNieve(self.user)
                 
                 if not Resultado:
                     pass
@@ -183,7 +184,7 @@ class Menus:
                     print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
             
             elif option == 2:
-                Resultado = dao.metodo_avalancha(self.user)
+                Resultado = Dao.Avalancha(self.user)
                 
                 if not Resultado:
                    pass
@@ -192,23 +193,22 @@ class Menus:
                     print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
             
             elif option == 3:
-                descripcion = input("Descripcion:")
-                cantidad_total = float(input("Cantidad Total:"))
-                interes = float(input("Interes(sino 0.00):"))
-                cantidad_pagada = float(input("Cantidad Pagada(sino 0.00):"))
-                resp = dao.create_deuda(self.user, descripcion, cantidad_total, interes, cantidad_pagada)
-                print(resp)
+                Descripcion = input("Descripcion:")
+                CantidadTotal = float(input("Cantidad Total:"))
+                Interes = float(input("Interes(sino 0.00):"))
+                Resp = Dao.CreateDeuda(self.user, Descripcion, CantidadTotal, Interes)
+                print(Resp)
             elif option == 4: 
-                id = int(input("Id deuda:"))
+                Id = int(input("Id deuda:"))
                 Cantidad = float(input("Introduce la cantidad pagada(sino 0.00):"))
-                Verificador = dao.insertar_cantidad_pagada(Cantidad,id)
-                print(Verificador)
+                Resp = Dao.CantidadPagada(Cantidad,Id)
+                print(Resp)
             elif option == 5:
                 break
 
     def menu_inversion(self):
         while True:
-            Acciones, GananciaTotal, _ , ValorAccion = dao.ver_el_precio_actual(self.user)
+            Acciones, GananciaTotal, _ , ValorAccion = Dao.PrecioActual(self.user)
             
             if ValorAccion == 0 and GananciaTotal == 0:
                 print(Fore.RED + Style.BRIGHT + "\nNo hay datos")
@@ -229,13 +229,13 @@ class Menus:
                 
             if option== 1:
                 print("\nTiene que ser las siglas de yahoo finance!!!\n")
-                siglas = input("Siglas:")
-                precio_compra = float(input("Precio_de_Compra(sino 0.00):"))
-                cantidad = float(input("Cantidad(sino 0.00):"))
-                res = dao.create_inversion(siglas,cantidad,precio_compra,self.user)
-                print(res)
+                Siglas = input("Siglas:")
+                PrecioCompra = float(input("Precio_de_Compra(sino 0.00):"))
+                Cantidad = float(input("Cantidad(sino 0.00):"))
+                Resp = Dao.CreateInversion(Siglas,Cantidad,PrecioCompra,self.user)
+                print(Resp)
             elif option == 3:
-                Resultado = dao.read_inversiones(self.user)
+                Resultado = Dao.ReadInversiones(self.user)
 
                 if not Resultado:
                     pass
@@ -244,12 +244,12 @@ class Menus:
                     print("\n"+tabulate(Resultado, headers=headers, tablefmt="github"))
             
             elif option == 5:
-                id = int(input("ID de la inversion:"))
-                PrecioVenta = float(input("Precio de venta (0.00):"))
-                Retorno = dao.sell_invesment(PrecioVenta,id)
-                print(Retorno)
+                Id = int(input("ID de la inversion:"))
+                PrecioVenta = float(input("Precio de venta sino(0.00):"))
+                Resp = Dao.SellInvesment(PrecioVenta,Id)
+                print(Resp)
             elif option == 4:
-                Monedas = dao.ConsultaMonedas(self.user)
+                Monedas = Dao.ConsultaMonedas(self.user)
                 
                 if not Monedas:
                     pass
@@ -259,10 +259,10 @@ class Menus:
             
             elif option == 2:
                 print("\nTiene que ser las siglas de yahoo finance!!!\n")
-                siglas = input("Siglas:")
-                cantidad = float(input("Cantidad(sino 0.00):"))
-                res = dao.CreateMoney(siglas,cantidad,self.user)
-                print(res)
+                Siglas = input("Siglas:")
+                Cantidad = float(input("Cantidad(sino 0.00):"))
+                Resp = Dao.CreateMoney(Siglas,Cantidad,self.user)
+                print(Resp)
             elif option == 6:
                 break
                 
