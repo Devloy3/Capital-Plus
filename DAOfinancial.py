@@ -99,7 +99,7 @@ class DAOfinancial:
         return self.cursor.fetchall()
     
     def metodo_avalancha(self,id):
-        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes ASC",(id,))
+        self.cursor.execute("SELECT id,Descripcion,cantidad_total,cantidad_pagada,interes FROM deudas WHERE user=? ORDER BY interes DESC",(id,))
         return self.cursor.fetchall()
 
     def finish_deudas(self,id):
